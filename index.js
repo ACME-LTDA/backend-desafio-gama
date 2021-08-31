@@ -9,4 +9,3 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 iniciaBanco()
-app.use('/pilotos', pilotosRouter)

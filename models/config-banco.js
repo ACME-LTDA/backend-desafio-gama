@@ -16,7 +16,7 @@ async function iniciaBanco() {
     await populaConstrutores()
     await populaTemporadasPeriodo(ANOINICIO, ANOFIM)
     await populaCorridasPeriodo(ANOINICIO, ANOFIM)
-    await populaResultadosPeriodo(ANOINICIO, ANOFIM)
+    // await populaResultadosPeriodo(ANOINICIO, ANOFIM)
 }
 
 module.exports = { iniciaBanco }
