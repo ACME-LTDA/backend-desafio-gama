@@ -4,11 +4,12 @@ const argv = require('minimist')(process.argv.slice(2))
 const nomeDB = argv['nomedb'] ?? 'desafio_f1'
 const senhaDB = argv['senhadb'] ?? '12345'
 const usuarioDB = argv['usuariodb'] ?? 'root'
+const portaDB = argv['portaDB'] ?? '3306'
 
 const sequelize = new Sequelize({
     dialect: 'mysql',
     host: 'localhost',
-    port: 3306,
+    port: portaDB,
     database: nomeDB,
     username: usuarioDB,
     password: senhaDB
