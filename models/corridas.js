@@ -18,6 +18,6 @@ const Corrida = sequelize.define('Corrida', {
     timestamps: false
 })
 
-Corrida.belongsTo(Temporada, { foreignKey: 'idTemporada' })
+Corrida.belongsTo(Temporada, { foreignKey: 'idTemporada', allowNull: false })
 
 module.exports = { Corrida }

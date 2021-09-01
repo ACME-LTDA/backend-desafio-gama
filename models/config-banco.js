@@ -17,6 +17,7 @@ async function iniciaBanco() {
     await populaTemporadasPeriodo(ANOINICIO, ANOFIM)
     await populaCorridasPeriodo(ANOINICIO, ANOFIM)
     await populaResultadosPeriodo(ANOINICIO, ANOFIM)
+    console.log('\n\nBanco inicializado e populado com os dados da API')
 }
 
 module.exports = { iniciaBanco }
