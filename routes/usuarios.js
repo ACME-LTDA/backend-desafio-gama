@@ -5,7 +5,7 @@ const usuarios_controller = require('../controllers/usuarios');
 
 
 // router.post('/create', usuarios_controller.usuarios_create);
-router.post('/create', usuarios_controller.criaUsuario);
+router.post('/create', usuarios_controller.criaUsuario)
 
 // router.get('/test', usuarios_controller.test);
 
