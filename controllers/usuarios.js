@@ -20,6 +20,7 @@ exports.criaUsuario = async (req, res, next) => {
         console.log('Usuário criado com sucesso')
     })
     .catch(err => {
+        console.log('Usuário não foi criado')
         if (err instanceof UniqueConstraintError)
             msgErro = 'Email já em uso!'
     })
