@@ -4,6 +4,27 @@ const { UniqueConstraintError } = require('sequelize');
 
 const rodadasSalt = 10
 
+exports.criaAdmin = async () => {
+  await Usuario.sync()
+  const totalUsuarios = await Usuario.count()
+  if (totalUsuarios == 0) {
+    console.log('Criando o admin')
+    const saltSenha = await bcrypt.genSalt(rodadasSalt)
+    const hashSenha = await bcrypt.hash("12345", saltSenha)
+    await Usuario.create({
+        email: "admin@admin.com",
+        nome: "Admin",
+        sobrenome: "System",
+        hashSenha: hashSenha,
+        salt: saltSenha,
+        administrador: "T"
+    })
+    .then(() => {
+        console.log('Admin criado com sucesso')
+    })
+  }
+}
+
 exports.criaUsuario = async (req, res, next) => {
     const saltSenha = await bcrypt.genSalt(rodadasSalt)
     const hashSenha = await bcrypt.hash(req.body.senha, saltSenha)
@@ -14,7 +35,8 @@ exports.criaUsuario = async (req, res, next) => {
         nome: req.body.nome,
         sobrenome: req.body.sobrenome,
         hashSenha: hashSenha,
-        salt: saltSenha
+        salt: saltSenha,
+        administrador: "F"
     })
     .then(() => {
         console.log('Usuário criado com sucesso')

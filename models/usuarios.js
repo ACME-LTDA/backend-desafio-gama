@@ -32,6 +32,14 @@ const Usuario = sequelize.define('Usuario', {
         type: Sequelize.STRING(200),
         allowNull: false
     },
+    administrador: {
+      type: Sequelize.STRING(1),
+      allowNull: false,
+      // T para True, F para False
+      validate: {
+        is: /^[TF]/i
+      }
+    }
 
 }, {
     tableName: 'Usuarios',

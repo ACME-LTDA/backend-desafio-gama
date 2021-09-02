@@ -4,6 +4,7 @@ const { populaConstrutores } = require('../controllers/construtores')
 const { populaTemporadasPeriodo } = require('../controllers/temporadas')
 const { populaCorridasPeriodo } = require('../controllers/corridas')
 const { populaResultadosPeriodo } = require('../controllers/resultados')
+const { criaAdmin } = require('../controllers/usuarios')
 
 const ANOINICIO = 2019
 const ANOFIM = 2020
@@ -17,6 +18,7 @@ async function iniciaBanco() {
     await populaTemporadasPeriodo(ANOINICIO, ANOFIM)
     await populaCorridasPeriodo(ANOINICIO, ANOFIM)
     await populaResultadosPeriodo(ANOINICIO, ANOFIM)
+    await criaAdmin()
     console.log('\n\nBanco inicializado e populado com os dados da API')
 }
 
