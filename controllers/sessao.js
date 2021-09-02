@@ -1,10 +1,11 @@
 const { Usuario } = require('../models/usuarios')
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
-function geraJwt(usuario) {
+function geraJwt(email, isAdmin) {
   const segredo = process.env.SEGREDO || "SEGREDO007"
-
-  return token
+  return jwt.sign({ email: email, admin: isAdmin }, segredo,
+    { expiresIn: '180s' })
 }
 
 exports.autenticaUsuario = async (req, res, next) => {
@@ -25,13 +26,14 @@ exports.autenticaUsuario = async (req, res, next) => {
         code: 404,
         message: 'Senha inválida'
       })
-    } else if (usuario.administrador == "T") {
+    } else {
+      const isAdmin = usuario.administrador == "T" ? true : false
+      const token = geraJwt(usuario.email, isAdmin)
       res.status(200).json({
         code: 200,
-        isAdmin: true,
+        token: token,
+        isAdmin: isAdmin
       })
     }
   }
-  // else if (usuario.to)
-  // console.log('pausa')
 }
