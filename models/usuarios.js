@@ -12,7 +12,10 @@ const Usuario = sequelize.define('Usuario', {
     email: {
         type: Sequelize.STRING(100),
         allowNull: false,
-        unique: true
+        unique: true,
+        validate: {
+            isEmail: true
+        }
     },
     nome: {
         type: Sequelize.STRING(50),
@@ -31,7 +34,7 @@ const Usuario = sequelize.define('Usuario', {
     },
 
 }, {
-    tableName: 'Usuario',
+    tableName: 'Usuarios',
     timestamps: false
 })
 

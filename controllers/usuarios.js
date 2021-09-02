@@ -1,15 +1,15 @@
 const { Usuario } = require('../models/usuarios')
 const bcrypt = require('bcrypt');
+const { UniqueConstraintError } = require('sequelize');
 
 const rodadasSalt = 10
 
 exports.criaUsuario = async (req, res, next) => {
     const saltSenha = await bcrypt.genSalt(rodadasSalt)
     const hashSenha = await bcrypt.hash(req.body.senha, saltSenha)
-    console.log(hashSenha)
-    console.log(saltSenha)
     Usuario.sync()
-    Usuario.create({
+    let msgErro = null
+    await Usuario.create({
         email: req.body.email,
         nome: req.body.nome,
         sobrenome: req.body.sobrenome,
@@ -17,11 +17,24 @@ exports.criaUsuario = async (req, res, next) => {
         salt: saltSenha
     })
     .then(() => {
-        console.log('Criando o usuário')
+        console.log('Usuário criado com sucesso')
     })
     .catch(err => {
-        console.log('Erro ao criar o usuário: ', err)
+        if (err instanceof UniqueConstraintError)
+            msgErro = 'Email já em uso!'
     })
+
+    if (msgErro == null) {
+        res.status(200).json({
+            code: 200,
+            message: 'Usuário cadastrado com sucesso'
+        })
+    } else {
+        res.status(400).json({
+            code: 400,
+            message: msgErro
+        })
+    }
 }
 
 // exports.cliente_details = (req, res, next) => {
