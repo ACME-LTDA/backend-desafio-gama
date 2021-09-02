@@ -4,6 +4,7 @@ const { iniciaBanco } = require('./models/config-banco')
 // const pilotosRouter = require('./routes/pilotos')
 const usuariosRoutes = require('./routes/usuarios')
 
+require('dotenv').config({path: __dirname + '/.env'})
 
 const app = express()
 
@@ -14,7 +15,7 @@ app.use('/usuarios', usuariosRoutes)
 
 iniciaBanco()
 
-const port = 3001;
+const port = process.env.PORTA_APP || 3001;
 
 console.log('Iniciando o servidor...')
 app.listen(port, () => {
