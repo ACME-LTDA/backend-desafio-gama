@@ -36,6 +36,7 @@ exports.autenticaUsuario = async (req, res, next) => {
       res.status(200).json({
         code: 200,
         token: token,
+        id: usuario.id,
         isAdmin: isAdmin
       })
     }
