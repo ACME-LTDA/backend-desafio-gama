@@ -2,10 +2,14 @@ const { Usuario } = require('../models/usuarios')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
-function geraJwt(email, isAdmin) {
-  const segredo = process.env.SEGREDO || "SEGREDO007"
-  return jwt.sign({ email: email, admin: isAdmin }, segredo,
-    { expiresIn: '180s' })
+function obtemSegredoJwt() {
+  return process.env.SEGREDO || "SEGREDO07"
+}
+
+function geraJwt(id, isAdmin) {
+  const segredo = obtemSegredoJwt()
+  return jwt.sign({ id: id, admin: isAdmin }, segredo,
+    { expiresIn: '1800s' })
 }
 
 exports.autenticaUsuario = async (req, res, next) => {
@@ -14,8 +18,8 @@ exports.autenticaUsuario = async (req, res, next) => {
   })
   if (usuario == null) {
     res.status(401).json({
-      code: 404,
-      message: 'Email não cadastrado'
+      code: 401,
+      message: 'Email ou senha inválidos!'
     })
   } else {
     const senhaValida = await bcrypt.compare(
@@ -23,12 +27,12 @@ exports.autenticaUsuario = async (req, res, next) => {
       usuario.hashSenha)
     if (!senhaValida) {
       res.status(401).json({
-        code: 404,
-        message: 'Senha inválida'
+        code: 401,
+        message: 'Email ou senha inválidos!'
       })
     } else {
       const isAdmin = usuario.administrador == "T" ? true : false
-      const token = geraJwt(usuario.email, isAdmin)
+      const token = geraJwt(usuario.id, isAdmin)
       res.status(200).json({
         code: 200,
         token: token,
@@ -37,3 +41,45 @@ exports.autenticaUsuario = async (req, res, next) => {
     }
   }
 }
+
+async function verificaJwt(req, res, next) {
+  var resultadoValidacao = {
+    tokenValido: false,
+    isAdmin: null,
+    id: null
+  }
+  const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split(' ')[1]
+
+  if (token == null) {
+    await res.status(401).json({
+      code: 401,
+      message: "Token não enviado"
+    })
+    return resultadoValidacao
+  }
+
+  const segredo = obtemSegredoJwt()
+  await jwt.verify(token, segredo, async (err, user) => {
+    if (err instanceof jwt.TokenExpiredError) {
+      await res.status(401).json({
+        code: 401,
+        message: "Token expirado"
+      })
+      return
+    } else if(err instanceof jwt.JsonWebTokenError) {
+      await res.status(401).json({
+        code: 401,
+        message: "Token inválido"
+      })
+      return
+    } else {
+      resultadoValidacao.tokenValido = true
+      resultadoValidacao.isAdmin = user.admin
+      resultadoValidacao.id = user.id
+    }
+  })
+  return resultadoValidacao
+}
+
+module.exports.verificaJwt = verificaJwt

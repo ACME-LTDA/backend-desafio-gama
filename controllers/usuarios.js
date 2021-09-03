@@ -1,6 +1,7 @@
 const { Usuario } = require('../models/usuarios')
 const bcrypt = require('bcrypt');
 const { UniqueConstraintError } = require('sequelize');
+const { verificaJwt } = require('./sessao');
 
 const rodadasSalt = 10
 
@@ -26,37 +27,41 @@ exports.criaAdmin = async () => {
 }
 
 exports.criaUsuario = async (req, res, next) => {
-    const saltSenha = await bcrypt.genSalt(rodadasSalt)
-    const hashSenha = await bcrypt.hash(req.body.senha, saltSenha)
-    Usuario.sync()
-    let msgErro = null
-    await Usuario.create({
-        email: req.body.email,
-        nome: req.body.nome,
-        sobrenome: req.body.sobrenome,
-        hashSenha: hashSenha,
-        salt: saltSenha,
-        administrador: "F"
-    })
-    .then(() => {
-        console.log('Usuário criado com sucesso')
-    })
-    .catch(err => {
-        console.log('Usuário não foi criado')
-        if (err instanceof UniqueConstraintError)
-            msgErro = 'Email já em uso!'
-    })
+    // checa se o token eh valido EEE se o usuario eh admin
+    const { tokenValido, isAdmin } = await verificaJwt(req, res, next)
+    if (tokenValido && isAdmin) {
+      const saltSenha = await bcrypt.genSalt(rodadasSalt)
+      const hashSenha = await bcrypt.hash(req.body.senha, saltSenha)
+      Usuario.sync()
+      let msgErro = null
+      await Usuario.create({
+          email: req.body.email,
+          nome: req.body.nome,
+          sobrenome: req.body.sobrenome,
+          hashSenha: hashSenha,
+          salt: saltSenha,
+          administrador: "F"
+      })
+      .then(() => {
+          console.log('Usuário criado com sucesso')
+      })
+      .catch(err => {
+          console.log('Usuário não foi criado')
+          if (err instanceof UniqueConstraintError)
+              msgErro = 'Email já em uso!'
+      })
 
-    if (msgErro == null) {
-        res.status(200).json({
-            code: 200,
-            message: 'Usuário cadastrado com sucesso'
-        })
-    } else {
-        res.status(400).json({
-            code: 400,
-            message: msgErro
-        })
+      if (msgErro == null) {
+          res.status(200).json({
+              code: 200,
+              message: 'Usuário cadastrado com sucesso'
+          })
+      } else {
+          res.status(400).json({
+              code: 400,
+              message: msgErro
+          })
+      }
     }
 }
 
