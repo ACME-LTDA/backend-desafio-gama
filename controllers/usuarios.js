@@ -13,16 +13,16 @@ exports.criaAdmin = async () => {
     const saltSenha = await bcrypt.genSalt(rodadasSalt)
     const hashSenha = await bcrypt.hash("12345", saltSenha)
     await Usuario.create({
-        email: "admin@admin.com",
-        nome: "Admin",
-        sobrenome: "System",
-        hashSenha: hashSenha,
-        salt: saltSenha,
-        administrador: "T"
+      email: "admin@admin.com",
+      nome: "Admin",
+      sobrenome: "System",
+      hashSenha: hashSenha,
+      salt: saltSenha,
+      administrador: "T"
     })
-    .then(() => {
+      .then(() => {
         console.log('Admin criado com sucesso')
-    })
+      })
   }
 }
 
@@ -32,7 +32,6 @@ exports.criaUsuario = async (req, res, next) => {
   if (tokenValido && isAdmin) {
     const saltSenha = await bcrypt.genSalt(rodadasSalt)
     const hashSenha = await bcrypt.hash(req.body.senha, saltSenha)
-    d
     Usuario.sync()
     let msgErro = null
     await Usuario.create({
@@ -43,14 +42,14 @@ exports.criaUsuario = async (req, res, next) => {
       salt: saltSenha,
       administrador: "F"
     })
-    .then(() => {
-      console.log('Usuário criado com sucesso')
-    })
-    .catch(err => {
-      console.log('Usuário não foi criado')
-      if (err instanceof UniqueConstraintError)
-        msgErro = 'Email já em uso!'
-    })
+      .then(() => {
+        console.log('Usuário criado com sucesso')
+      })
+      .catch(err => {
+        console.log('Usuário não foi criado')
+        if (err instanceof UniqueConstraintError)
+          msgErro = 'Email já em uso!'
+      })
 
     if (msgErro == null) {
       res.status(200).json({

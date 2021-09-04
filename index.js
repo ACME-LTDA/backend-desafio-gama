@@ -5,7 +5,7 @@ const { iniciaBanco } = require('./models/config-banco')
 const usuariosRoutes = require('./routes/usuarios')
 const sessoesRoutes = require('./routes/sessao')
 
-require('dotenv').config({path: __dirname + '/.env'})
+require('dotenv').config({ path: __dirname + '/.env' })
 
 const app = express()
 
@@ -21,5 +21,7 @@ const port = process.env.PORTA_APP || 3001;
 
 console.log('Iniciando o servidor...')
 app.listen(port, () => {
-    console.log(`Servidor iniciado com sucesso na porta: ${port}`)
+  console.log(`Servidor iniciado com sucesso na porta: ${port}`)
 })
+
+module.exports = { PORTA_DB }
