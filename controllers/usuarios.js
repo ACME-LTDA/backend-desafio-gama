@@ -65,12 +65,49 @@ exports.criaUsuario = async (req, res, next) => {
   }
 }
 
-// exports.cliente_details = (req, res, next) => {
-//     Cliente.findById(req.params.id, (err, cliente) => {
-//         if (err) return next(new Error(`Ocorreu um erro: ${err}`));
-//         res.send(cliente);
-//     })
-// }
+exports.retornaDadosUsuario = async (req, res, next) => {
+  if (req.params.id == undefined)
+    return res.status(400).send()
+  else {
+    const dadosToken = await verificaJwt(req, res, next)
+    if (dadosToken.tokenValido) {
+      if (dadosToken.id != req.params.id)
+        return res.status(403).send()
+
+      const dadosUsuario = await Usuario.findByPk(req.params.id)
+        .then(usuario => usuario.get())
+
+      return res.status(200).json({
+        code: 200,
+        dados: {
+          email: dadosUsuario.email,
+          nome: dadosUsuario.nome,
+          sobrenome: dadosUsuario.sobrenome
+        }
+      })
+    }
+  }
+}
+
+exports.removerUsuario = async (req, res, next) => {
+  if (req.params.id == undefined)
+    return res.status(400).send()
+  else {
+    const dadosToken = await verificaJwt(req, res, next)
+    if (dadosToken.tokenValido) {
+      if (dadosToken.id != req.params.id)
+        return res.status(403).send()
+
+      const usuario = await Usuario.findByPk(dadosToken.id)
+      await usuario.destroy()
+      res.status(200).json({
+        code: 200,
+        message: 'Usuário removido com sucesso'
+      })
+    }
+  }
+}
+
 
 // exports.cliente_update = (req, res, next) => {
 //     Cliente.findByIdAndUpdate(req.params.id, {$set: req.body}, (err) => {
