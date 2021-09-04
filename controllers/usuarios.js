@@ -28,8 +28,7 @@ exports.criaAdmin = async () => {
 
 exports.criaUsuario = async (req, res, next) => {
   // checa se o token eh valido EEE se o usuario eh admin
-  const { tokenValido, isAdmin } = await verificaJwt(req, res, next)
-  if (tokenValido && isAdmin) {
+  if (res.locals.isAdmin) {
     const saltSenha = await bcrypt.genSalt(rodadasSalt)
     const hashSenha = await bcrypt.hash(req.body.senha, saltSenha)
     Usuario.sync()
@@ -69,23 +68,20 @@ exports.retornaDadosUsuario = async (req, res, next) => {
   if (req.params.id == undefined)
     return res.status(400).send()
   else {
-    const dadosToken = await verificaJwt(req, res, next)
-    if (dadosToken.tokenValido) {
-      if (dadosToken.id != req.params.id)
-        return res.status(403).send()
+    if (res.locals.id != req.params.id)
+      return res.status(403).send()
 
-      const dadosUsuario = await Usuario.findByPk(req.params.id)
-        .then(usuario => usuario.get())
+    const dadosUsuario = await Usuario.findByPk(req.params.id)
+      .then(usuario => usuario.get())
 
-      return res.status(200).json({
-        code: 200,
-        dados: {
-          email: dadosUsuario.email,
-          nome: dadosUsuario.nome,
-          sobrenome: dadosUsuario.sobrenome
-        }
-      })
-    }
+    return res.status(200).json({
+      code: 200,
+      dados: {
+        email: dadosUsuario.email,
+        nome: dadosUsuario.nome,
+        sobrenome: dadosUsuario.sobrenome
+      }
+    })
   }
 }
 
@@ -93,18 +89,15 @@ exports.removerUsuario = async (req, res, next) => {
   if (req.params.id == undefined)
     return res.status(400).send()
   else {
-    const dadosToken = await verificaJwt(req, res, next)
-    if (dadosToken.tokenValido) {
-      if (dadosToken.id != req.params.id)
-        return res.status(403).send()
+    if (res.locals.id != req.params.id)
+      return res.status(403).send()
 
-      const usuario = await Usuario.findByPk(dadosToken.id)
-      await usuario.destroy()
-      res.status(200).json({
-        code: 200,
-        message: 'Usuário removido com sucesso'
-      })
-    }
+    const usuario = await Usuario.findByPk(res.locals.id)
+    await usuario.destroy()
+    res.status(200).json({
+      code: 200,
+      message: 'Usuário removido com sucesso'
+    })
   }
 }
 
