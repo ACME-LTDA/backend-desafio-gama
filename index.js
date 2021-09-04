@@ -23,5 +23,3 @@ console.log('Iniciando o servidor...')
 app.listen(port, () => {
   console.log(`Servidor iniciado com sucesso na porta: ${port}`)
 })
-
-module.exports = { PORTA_DB }
