@@ -1,7 +1,9 @@
 const { Usuario } = require('../models/usuarios')
 const bcrypt = require('bcrypt');
 const { UniqueConstraintError } = require('sequelize');
-const { verificaJwt } = require('./sessao');
+const { RefreshToken } = require('../models/sessao');
+
+const { tokenCookieName, tokenCookiePath } = require('./sessao');
 
 const rodadasSalt = 10
 
@@ -92,12 +94,19 @@ exports.removerUsuario = async (req, res, next) => {
     if (res.locals.id != req.params.id)
       return res.status(403).send()
 
+    await RefreshToken.destroy({
+      where: { idUsuario: res.locals.id }
+    })
+    res
     const usuario = await Usuario.findByPk(res.locals.id)
     await usuario.destroy()
-    res.status(200).json({
-      code: 200,
-      message: 'Usuário removido com sucesso'
-    })
+    return res
+      .status(200)
+      .clearCookie(tokenCookieName, { path: tokenCookiePath })
+      .json({
+        code: 200,
+        message: 'Usuário removido com sucesso'
+      })
   }
 }
 

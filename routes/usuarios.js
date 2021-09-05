@@ -1,8 +1,8 @@
 const express = require('express');
-const { validaAccessToken } = require('../controllers/sessao');
 const router = express.Router();
 
 const usuarios_controller = require('../controllers/usuarios');
+const { validaAccessToken } = require('../controllers/sessao');
 
 
 // router.post('/create', usuarios_controller.usuarios_create);

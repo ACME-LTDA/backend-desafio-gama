@@ -6,9 +6,9 @@ const duration = require('dayjs/plugin/duration')
 
 const { Usuario } = require('../models/usuarios')
 const { RefreshToken } = require('../models/sessao')
-const cookieParser = require('cookie-parser')
 
-const refreshTokenCookieName = 'user_auth_cookie'
+const tokenCookieName = 'user_auth_cookie'
+const tokenCookiePath = '/sessao'
 const obtemSegredo = () => process.env.SEGREDO || "SEGREDO07"
 
 function geraAcessToken(id, isAdmin) {
@@ -38,13 +38,13 @@ async function geraRefreshToken(idUsuario, isAdmin) {
 
 const renovaAccessToken = async (req, res, next) => {
   const signedCookies = req.signedCookies
-  if (signedCookies == null || signedCookies['user_auth_cookie'] == undefined)
+  if (signedCookies == null || signedCookies[tokenCookieName] == undefined)
     return res.status(400).json({
       status: 'fail',
       data: { message: 'No refresh token cookie' }
     })
 
-  const cookieData = signedCookies['user_auth_cookie']
+  const cookieData = signedCookies[tokenCookieName]
   const dadosToken = await jwt.verify(cookieData.refreshToken,
     obtemSegredo())
 
@@ -97,10 +97,10 @@ const logaUsuario = async (req, res, next) => {
       dayjs.extend(duration)
       res.status(201)
         .cookie(
-          refreshTokenCookieName,
+          tokenCookieName,
           { refreshToken: refreshToken },
           {
-            path: '/sessao',
+            path: tokenCookiePath,
             maxAge: dayjs.duration(7, 'day').asMilliseconds(),
             signed: true,
             httpOnly: true
@@ -159,4 +159,11 @@ const validaAccessToken = async (req, res, next) => {
 }
 
 
-module.exports = { obtemSegredo, validaAccessToken, logaUsuario, renovaAccessToken }
+module.exports = {
+  obtemSegredo,
+  validaAccessToken,
+  logaUsuario,
+  renovaAccessToken,
+  tokenCookieName,
+  tokenCookiePath
+}
