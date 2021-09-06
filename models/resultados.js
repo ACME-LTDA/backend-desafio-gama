@@ -1,6 +1,7 @@
 const { DataTypes, Sequelize } = require('sequelize')
 const { sequelize } = require('./config_sequelize')
 const { Construtor } = require('./construtores')
+const { Corrida } = require('./corridas')
 const { Piloto } = require('./pilotos')
 const { Temporada } = require('./temporadas')
 
@@ -21,8 +22,9 @@ const Resultado = sequelize.define('Resultado', {
     timestamps: false
 })
 
-Resultado.belongsTo(Temporada, { foreignKey: 'idTemporada' })
-Resultado.belongsTo(Piloto, { foreignKey: 'idPiloto' })
-Resultado.belongsTo(Construtor, { foreignKey: 'idConstrutor' })
+Resultado.belongsTo(Temporada, { foreignKey: 'idTemporada', allowNull: false })
+Resultado.belongsTo(Piloto, { foreignKey: 'idPiloto', allowNull: false })
+Resultado.belongsTo(Construtor, { foreignKey: 'idConstrutor', allowNull: false })
+Resultado.belongsTo(Corrida, { foreignKey: 'idCorrida', allowNull: false })
 
 module.exports = { Resultado }
