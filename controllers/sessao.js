@@ -37,34 +37,15 @@ async function geraRefreshToken(idUsuario, isAdmin) {
 }
 
 const renovaAccessToken = async (req, res, next) => {
-  const signedCookies = req.signedCookies
-  if (signedCookies == null || signedCookies[tokenCookieName] == undefined)
-    return res.status(400).json({
-      status: 'fail',
-      data: { message: 'No refresh token cookie' }
-    })
-
-  const cookieData = signedCookies[tokenCookieName]
-  const dadosToken = await jwt.verify(cookieData.refreshToken,
-    obtemSegredo())
-
-  const refreshTokenSalvo = await RefreshToken.findByPk(dadosToken.uuid)
-
-  if (refreshTokenSalvo == null)
-    return res.status(400).json({
-      status: 'fail',
-      data: { message: 'Invalid refresh token' }
-    })
-
-  const newAccessToken = await geraAcessToken(dadosToken.id,
-    dadosToken.isAdmin)
+  const newAccessToken = await geraAcessToken(res.locals.dadosToken.id,
+    res.locals.dadosToken.isAdmin)
 
   return res.status(201).json({
     status: 'success',
     data: {
       token: newAccessToken,
-      id: dadosToken.id,
-      isAdmin: dadosToken.isAdmin
+      id: res.locals.dadosToken.id,
+      isAdmin: res.locals.dadosToken.isAdmin
     }
   })
 }
@@ -114,6 +95,19 @@ const logaUsuario = async (req, res, next) => {
   }
 }
 
+const deslogaUsuario = async (req, res, next) => {
+  await res.locals.refreshTokenSalvo.destroy()
+  return res
+    .status(200)
+    .clearCookie(tokenCookieName, { path: tokenCookiePath })
+    .json({
+      status: 'success',
+      data: {
+        message: 'Logout efetivado com sucesso'
+      }
+    })
+}
+
 const validaAccessToken = async (req, res, next) => {
   const authHeader = req.headers['authorization']
   const token = authHeader && authHeader.split(' ')[1]
@@ -156,10 +150,41 @@ const validaAccessToken = async (req, res, next) => {
 }
 
 
+const validaRefreshToken = async (req, res, next) => {
+  const signedCookies = req.signedCookies
+  if (signedCookies == null || signedCookies[tokenCookieName] == undefined)
+    return res.status(400).json({
+      status: 'fail',
+      data: { message: 'No refresh token cookie' }
+    })
+
+  const cookieData = signedCookies[tokenCookieName]
+  const dadosToken = await jwt.verify(cookieData.refreshToken,
+    obtemSegredo())
+
+  const refreshTokenSalvo = await RefreshToken.findByPk(dadosToken.uuid)
+
+  const dataExpiracao = dayjs(refreshTokenSalvo.dataExpiracao)
+  const diferenca = dataExpiracao.diff(dayjs().unix())
+
+  if (refreshTokenSalvo == null || diferenca <= 0)
+    return res.status(400).json({
+      status: 'fail',
+      data: { message: 'Invalid refresh token' }
+    })
+
+  res.locals.dadosToken = dadosToken
+  res.locals.refreshTokenSalvo = refreshTokenSalvo
+  next()
+}
+
+
 module.exports = {
   obtemSegredo,
   validaAccessToken,
+  validaRefreshToken,
   logaUsuario,
+  deslogaUsuario,
   renovaAccessToken,
   tokenCookieName,
   tokenCookiePath
