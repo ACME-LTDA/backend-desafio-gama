@@ -164,10 +164,16 @@ const validaRefreshToken = async (req, res, next) => {
 
   const refreshTokenSalvo = await RefreshToken.findByPk(dadosToken.uuid)
 
+  if (refreshTokenSalvo === null)
+    return res.status(400).json({
+      status: 'fail',
+      data: { message: 'Invalid refresh token' }
+    })
+
   const dataExpiracao = dayjs(refreshTokenSalvo.dataExpiracao)
   const diferenca = dataExpiracao.diff(dayjs().unix())
 
-  if (refreshTokenSalvo == null || diferenca <= 0)
+  if (diferenca <= 0)
     return res.status(400).json({
       status: 'fail',
       data: { message: 'Invalid refresh token' }
