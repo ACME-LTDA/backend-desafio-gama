@@ -11,7 +11,9 @@ require('dotenv').config({ path: __dirname + '/.env' })
 
 const app = express()
 
-app.use(cors())
+const cliente = process.env.CLIENT || 'http://localhost:3000'
+
+app.use(cors({ credentials: true, origin: cliente }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser(obtemSegredo()))

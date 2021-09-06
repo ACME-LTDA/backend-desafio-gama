@@ -56,9 +56,6 @@ const renovaAccessToken = async (req, res, next) => {
       data: { message: 'Invalid refresh token' }
     })
 
-  if (dadosToken.id != req.params.id)
-    return res.status(403).send()
-
   const newAccessToken = await geraAcessToken(dadosToken.id,
     dadosToken.isAdmin)
 
