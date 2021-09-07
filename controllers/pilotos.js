@@ -63,13 +63,12 @@ async function armazenaUmPiloto() {
   console.log(pilotoSalvo.toJSON())
 }
 
-const listaPilotos = async (req, res, next) => {
+const listaPilotos = async (req, res) => {
   const pilotos = await Piloto.findAll({
     attributes: ['id', 'nomeCompleto']
   })
 
-  return await res
-    .status(200)
+  return await res.status(200)
     .json({
       status: 'success',
       data: {
@@ -78,4 +77,77 @@ const listaPilotos = async (req, res, next) => {
     })
 }
 
-module.exports = { populaPilotos, armazenaUmPiloto, listaPilotos }
+const dadosPiloto = async (req, res) => {
+  const piloto = await Piloto.findByPk(req.params.id);
+
+  if (piloto !== null)
+    return await res.status(200)
+      .json({
+        status: 'success',
+        data: {
+          piloto: piloto.get()
+        }
+      });
+  else
+    return await res.status(404)
+      .json({
+        status: 'fail',
+        data: null
+      });
+}
+
+const criaPiloto = async (req, res) => {
+  if (req.body.primeiroNome === null || req.body.sobrenome === null)
+    return await res.status(400)
+      .json({
+        status: 'fail',
+        data: { message: 'O nome e sobrenome devem ser informados' }
+      })
+
+  const piloto = await Piloto.findAll({
+    where: {
+      primeiroNome: req.body.primeiroNome,
+      sobrenome: req.body.sobrenome
+    }
+  })
+  if (piloto.length > 0) {
+    return await res.status(400)
+      .json({
+        status: 'fail',
+        data: { message: 'O piloto já está cadastrado' }
+      })
+  }
+  const id = `${req.body.primeiroNome.toLowerCase()}_${req.body.sobrenome.toLowerCase()}`
+  await Piloto.create({
+    id: id,
+    primeiroNome: req.body.primeiroNome,
+    sobrenome: req.body.sobrenome,
+    urlWiki: req.body.urlWiki,
+    dataNascimento: req.body.dataNascimento,
+    nacionalidade: req.body.nacionalidade,
+    observacao: req.body.observacao
+  })
+    .then(
+      async piloto => {
+        await res.status(201)
+          .json({
+            status: 'success',
+            data: null
+          })
+      },
+      async err => {
+        await res.status(400)
+          .json({
+            status: 'fail',
+            data: { message: err.toString() }
+          })
+      })
+}
+
+module.exports = {
+  populaPilotos,
+  armazenaUmPiloto,
+  listaPilotos,
+  dadosPiloto,
+  criaPiloto
+}

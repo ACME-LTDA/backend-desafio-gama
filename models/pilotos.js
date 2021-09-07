@@ -1,13 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const { sequelize } = require('./config_sequelize')
 
-// driverId: 'arnoux',
-// url: 'http://en.wikipedia.org/wiki/Ren%C3%A9_Arnoux',
-// givenName: 'René',
-// familyName: 'Arnoux',
-// dateOfBirth: '1948-07-04',
-// nationality: 'French'
-
 const Piloto = sequelize.define('Piloto', {
   id: {
     type: Sequelize.STRING(30),
@@ -19,16 +12,23 @@ const Piloto = sequelize.define('Piloto', {
     type: Sequelize.STRING(200)
   },
   primeiroNome: {
-    type: Sequelize.STRING(100)
+    type: Sequelize.STRING(100),
+    allowNull: false
   },
   sobrenome: {
-    type: Sequelize.STRING(100)
+    type: Sequelize.STRING(100),
+    allowNull: false
   },
   dataNascimento: {
-    type: DataTypes.DATE
+    type: DataTypes.DATE,
+    allowNull: false
   },
   nacionalidade: {
-    type: Sequelize.STRING(30)
+    type: Sequelize.STRING(30),
+    allowNull: false
+  },
+  observacao: {
+    type: Sequelize.STRING(1000)
   },
   nomeCompleto: {
     type: DataTypes.VIRTUAL(DataTypes.STRING(200),
@@ -42,7 +42,9 @@ const Piloto = sequelize.define('Piloto', {
   }
 }, {
   tableName: 'Pilotos',
-  timestamps: false
+  timestamps: false,
+  charset: 'utf8',
+  collate: 'utf8_general_ci'
 })
 
 module.exports = { Piloto }
