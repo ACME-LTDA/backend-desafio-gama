@@ -19,8 +19,8 @@ async function iniciaBanco() {
   await populaTemporadasPeriodo(ANOINICIO, ANOFIM)
   await populaCorridasPeriodo(ANOINICIO, ANOFIM)
   await populaResultadosPeriodo(ANOINICIO, ANOFIM)
-  await RefreshToken.sync()
   await criaAdmin()
+  await RefreshToken.sync()
   console.log('\n\nBanco inicializado e populado com os dados da API')
 }
 
