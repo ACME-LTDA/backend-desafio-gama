@@ -135,7 +135,7 @@ const criaPiloto = async (req, res) => {
       });
 }
 
-const alteraPiloto = async (req, res, next) => {
+const alteraPiloto = async (req, res) => {
   const piloto = await Piloto.findByPk(req.params.id)
     .then(
       res => res,
