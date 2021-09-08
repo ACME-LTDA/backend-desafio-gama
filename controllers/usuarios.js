@@ -7,13 +7,13 @@ const { tokenCookieName, tokenCookiePath } = require('./sessao');
 
 const rodadasSalt = 10
 
-exports.criaAdmin = async () => {
-  await Usuario.sync()
-  const totalUsuarios = await Usuario.count()
+const criaAdmin = async () => {
+  await Usuario.sync();
+  const totalUsuarios = await Usuario.count();
   if (totalUsuarios == 0) {
-    console.log('Criando o admin')
-    const saltSenha = await bcrypt.genSalt(rodadasSalt)
-    const hashSenha = await bcrypt.hash("12345", saltSenha)
+    console.log('Criando o admin');
+    const saltSenha = await bcrypt.genSalt(rodadasSalt);
+    const hashSenha = await bcrypt.hash("12345", saltSenha);
     await Usuario.create({
       email: "admin@admin.com",
       nome: "Admin",
@@ -24,17 +24,17 @@ exports.criaAdmin = async () => {
     })
       .then(() => {
         console.log('Admin criado com sucesso')
-      })
+      });
   }
 }
 
-exports.criaUsuario = async (req, res, next) => {
+const criaUsuario = async (req, res) => {
   // checa se o token eh valido EEE se o usuario eh admin
   if (res.locals.isAdmin) {
-    const saltSenha = await bcrypt.genSalt(rodadasSalt)
-    const hashSenha = await bcrypt.hash(req.body.senha, saltSenha)
-    Usuario.sync()
-    let msgErro = null
+    const saltSenha = await bcrypt.genSalt(rodadasSalt);
+    const hashSenha = await bcrypt.hash(req.body.senha, saltSenha);
+    Usuario.sync();
+    let msgErro = null;
     await Usuario.create({
       email: req.body.email,
       nome: req.body.nome,
@@ -43,86 +43,113 @@ exports.criaUsuario = async (req, res, next) => {
       salt: saltSenha,
       administrador: "F"
     })
-      .then(() => {
-        console.log('Usuário criado com sucesso')
-      })
-      .catch(err => {
-        console.log('Usuário não foi criado')
-        if (err instanceof UniqueConstraintError)
-          msgErro = 'Email já em uso!'
-      })
+      .then(
+        () => {
+          console.log('Usuário criado com sucesso');
+        },
+        err => {
+          console.log('Usuário não foi criado')
+          if (err instanceof UniqueConstraintError)
+            msgErro = 'Email já em uso'
+        });
 
-    if (msgErro == null) {
+    if (msgErro === null) {
       res.status(200).json({
-        code: 200,
-        message: 'Usuário cadastrado com sucesso'
-      })
+        status: 'success',
+        data: null
+      });
     } else {
       res.status(400).json({
-        code: 400,
-        message: msgErro
-      })
+        status: 'fail',
+        data: { message: msgErro }
+      });
     }
   }
 }
 
-exports.retornaDadosUsuario = async (req, res, next) => {
+const retornaUsuario = async (req, res) => {
   if (req.params.id == undefined)
-    return res.status(400).send()
+    return await res.status(400).send();
   else {
     if (res.locals.id != req.params.id)
-      return res.status(403).send()
+      return await res.status(403).send();
 
     const dadosUsuario = await Usuario.findByPk(req.params.id)
-      .then(usuario => usuario.get())
+      .then(
+        usuario => usuario.get(),
+        err => null
+      );
 
-    return res.status(200).json({
-      code: 200,
-      dados: {
-        email: dadosUsuario.email,
-        nome: dadosUsuario.nome,
-        sobrenome: dadosUsuario.sobrenome
-      }
-    })
+    if (dadosUsuario !== null)
+      return await res.status(200).json({
+        status: 'success',
+        data: {
+          dados: {
+            email: dadosUsuario.email,
+            nome: dadosUsuario.nome,
+            sobrenome: dadosUsuario.sobrenome
+          }
+        }
+      });
+    else
+      return await res.status(400).send();
   }
 }
 
-exports.removerUsuario = async (req, res, next) => {
+const removerUsuario = async (req, res) => {
   if (req.params.id == undefined)
-    return res.status(400).send()
+    return await res.status(400).send();
   else {
     if (res.locals.id != req.params.id)
-      return res.status(403).send()
+      return await res.status(403).send();
 
     await RefreshToken.destroy({
       where: { idUsuario: res.locals.id }
-    })
-    res
-    const usuario = await Usuario.findByPk(res.locals.id)
-    await usuario.destroy()
-    return res
+    });
+    const usuario = await Usuario.findByPk(res.locals.id);
+    await usuario.destroy();
+    return await res
       .status(200)
       .clearCookie(tokenCookieName, { path: tokenCookiePath })
       .json({
-        code: 200,
-        message: 'Usuário removido com sucesso'
-      })
+        status: 'success',
+        data: {
+          message: 'Usuário removido com sucesso'
+        }
+      });
   }
 }
 
+const alteraUsuario = async (req, res) => {
+  const usuario = await Piloto.findByPk(req.params.id)
+    .then(
+      res => res,
+      err => null
+    );
+  if (usuario === null)
+    return await res.status(400).send();
+  else {
+    if (req.body.primeiroNome) piloto.primeiroNome = req.body.primeiroNome;
+    if (req.body.sobrenome) piloto.sobrenome = req.body.sobrenome;
+    if (req.body.urlWiki) piloto.urlWiki = req.body.urlWiki;
+    if (req.body.dataNascimento) piloto.dataNascimento = req.body.dataNascimento;
+    if (req.body.nacionalidade) piloto.nacionalidade = req.body.nacionalidade;
+    if (req.body.observacao) piloto.observacao = req.body.observacao;
 
-// exports.cliente_update = (req, res, next) => {
-//     Cliente.findByIdAndUpdate(req.params.id, {$set: req.body}, (err) => {
-//         if (err) return
-//             next(new Error(`Ocorreu um erro: ${err}`));
-//         res.send('Cliente alterado!')
-//     })
-// }
+    piloto.save();
 
-// exports.cliente_delete = (req, res, next) => {
-//     Cliente.findByIdAndRemove(req.params.id, (err => {
-//         if(err) return
-//             next(new Error(`Ocorreu um erro: ${err}`));
-//         res.send('Cliente excluído!')
-//     }))
-// }
+    return await res.status(201)
+      .json({
+        status: 'success',
+        data: null
+      });
+  }
+}
+
+module.exports = {
+  criaAdmin,
+  criaUsuario,
+  retornaUsuario,
+  removerUsuario,
+  alteraUsuario
+}
