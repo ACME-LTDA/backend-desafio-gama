@@ -1,23 +1,27 @@
-const express = require('express');
+const multer = require('multer');
+const express = require("express");
 const router = express.Router();
+const path = require('path')
 
-router.post('/', (req, res) => {
-  console.log('ENTROU');
-  if (!req.files) {
-    return res.status(500).send({ msg: "arquivo não foi encontrado" })
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, 'uploads/')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname )
   }
-  const myFile = req.files.file;
+});
 
-  myFile.mv(`${__dirname} / public / ${myFile.name}`, function (err) {
-    if (err) {
-      console.log(err)
-      return res.status(500).send({ msg: "Ocorreu um erro" });
-    }
-    // retendo a resposta com o caminho e nome do arquivo
-    return res.send({
-      name: myFile.name, path: `/${myFile.name}`
-    });
+const upload = multer({ storage:storage });
+
+router.post('/', upload.array('file'),  async (req, res) => {
+  console.log(`Files received: ${req.files.length}`);
+  res.send({
+    upload: true,
+    files: req.files,
   });
-})
+});
+
+
 
 module.exports = router;

@@ -6,9 +6,11 @@ const usuariosRoutes = require('./routes/usuarios')
 const sessoesRoutes = require('./routes/sessao')
 const uploadRoutes = require('./routes/upload')
 
+
 require('dotenv').config({ path: __dirname + '/.env' })
 
 const app = express()
+
 
 const cliente = process.env.CLIENT || 'http://localhost:3000'
 
@@ -17,9 +19,10 @@ app.use(express.static('public'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
+app.use(express.static('public'));
 app.use('/usuarios', usuariosRoutes)
 app.use('/sessao', sessoesRoutes)
-app.use('/upload', uploadRoutes)
+app.use('/uploads', uploadRoutes)
 
 iniciaBanco()
 
