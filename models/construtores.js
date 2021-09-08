@@ -7,24 +7,26 @@ const { sequelize } = require('./config_sequelize')
 // "nationality": "American"
 
 const Construtor = sequelize.define('Construtor', {
-    id: {
-        type: Sequelize.STRING(30),
-        allowNull: false,
-        unique: true,
-        primaryKey: true
-    },
-    urlWiki: {
-        type: Sequelize.STRING(200)
-    },
-    nome: {
-        type: Sequelize.STRING(100)
-    },
-    nacionalidade: {
-        type: Sequelize.STRING(30)
-    }
+  id: {
+    type: Sequelize.STRING(30),
+    allowNull: false,
+    unique: true,
+    primaryKey: true
+  },
+  urlWiki: {
+    type: Sequelize.STRING(200)
+  },
+  nome: {
+    type: Sequelize.STRING(100)
+  },
+  nacionalidade: {
+    type: Sequelize.STRING(30)
+  }
 }, {
-    tableName: 'Construtores',
-    timestamps: false
+  tableName: 'Construtores',
+  timestamps: false,
+  charset: 'utf8',
+  collate: 'utf8_general_ci'
 })
 
 module.exports = { Construtor }

@@ -6,20 +6,22 @@ const { Piloto } = require('./pilotos')
 const { Temporada } = require('./temporadas')
 
 const Resultado = sequelize.define('Resultado', {
-    id: {
-        type: DataTypes.STRING(10),
-        allowNull: false,
-        unique: true,
-        primaryKey: true
-    },
-    numeroCarro: DataTypes.TINYINT,
-    posLargada: DataTypes.TINYINT,
-    posChegada: DataTypes.TINYINT,
-    voltas: DataTypes.SMALLINT,
-    status: DataTypes.STRING(100)
+  id: {
+    type: DataTypes.STRING(10),
+    allowNull: false,
+    unique: true,
+    primaryKey: true
+  },
+  numeroCarro: DataTypes.TINYINT,
+  posLargada: DataTypes.TINYINT,
+  posChegada: DataTypes.TINYINT,
+  voltas: DataTypes.SMALLINT,
+  status: DataTypes.STRING(100)
 }, {
-    tableName: 'Resultados',
-    timestamps: false
+  tableName: 'Resultados',
+  timestamps: false,
+  charset: 'utf8',
+  collate: 'utf8_general_ci'
 })
 
 Resultado.belongsTo(Temporada, { foreignKey: 'idTemporada', allowNull: false })

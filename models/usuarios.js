@@ -47,7 +47,9 @@ const Usuario = sequelize.define('Usuario', {
 
 }, {
   tableName: 'Usuarios',
-  timestamps: false
+  timestamps: false,
+  charset: 'utf8',
+  collate: 'utf8_general_ci'
 })
 
 module.exports = { Usuario }

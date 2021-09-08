@@ -1,4 +1,4 @@
-const { iniciaConexaoBanco, sequelize } = require('./config_sequelize')
+const { iniciaConexaoBanco } = require('./config_sequelize')
 const { populaPilotos } = require('../controllers/pilotos')
 const { populaConstrutores } = require('../controllers/construtores')
 const { populaTemporadasPeriodo } = require('../controllers/temporadas')

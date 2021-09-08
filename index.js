@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser')
 const { iniciaBanco } = require('./models/config-banco')
 const usuariosRoutes = require('./routes/usuarios')
 const sessoesRoutes = require('./routes/sessao')
+const pilotosRoutes = require('./routes/pilotos')
 const { obtemSegredo } = require('./controllers/sessao')
 const uploadRoutes = require('./controllers/upload')
 
@@ -22,6 +23,7 @@ app.use(cookieParser(obtemSegredo()))
 
 app.use('/usuarios', usuariosRoutes)
 app.use('/sessao', sessoesRoutes)
+app.use('/pilotos', pilotosRoutes)
 
 iniciaBanco()
 
