@@ -147,6 +147,9 @@ const alteraUsuario = async (req, res) => {
       usuario.hashSenha = hashSenha;
       usuario.salt = saltSenha;
     }
+    if (req.files !== null && req.files.length > 0) {
+      console.log(req.files);
+    }
 
     usuario.save();
 

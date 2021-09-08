@@ -6,7 +6,7 @@ const { iniciaBanco } = require('./models/config-banco')
 const usuariosRoutes = require('./routes/usuarios')
 const sessoesRoutes = require('./routes/sessao')
 const { obtemSegredo } = require('./controllers/sessao')
-const uploadRoutes = require('./routes/upload')
+const uploadRoutes = require('./controllers/upload')
 
 require('dotenv').config({ path: __dirname + '/.env' })
 
@@ -22,7 +22,6 @@ app.use(cookieParser(obtemSegredo()))
 
 app.use('/usuarios', usuariosRoutes)
 app.use('/sessao', sessoesRoutes)
-app.use('/uploads', uploadRoutes)
 
 iniciaBanco()
 

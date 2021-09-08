@@ -42,7 +42,6 @@ const Usuario = sequelize.define('Usuario', {
   },
   nomeImagemAvatar: {
     type: Sequelize.STRING(255),
-    allowNull: false,
     unique: true
   }
 
