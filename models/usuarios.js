@@ -39,6 +39,11 @@ const Usuario = sequelize.define('Usuario', {
     validate: {
       is: /^[TF]/i
     }
+  },
+  nomeImagemAvatar: {
+    type: Sequelize.STRING(255),
+    allowNull: false,
+    unique: true
   }
 
 }, {

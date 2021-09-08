@@ -28,11 +28,22 @@ const criaAdmin = async () => {
   }
 }
 
+const criaHashSenha = async (senha) => {
+  let dadosHash = {
+    saltSenha: null,
+    hashSenha: null
+  }
+
+  dadosHash.saltSenha = await bcrypt.genSalt(rodadasSalt);
+  dadosHash.hashSenha = await bcrypt.hash(senha, dadosHash.saltSenha);
+
+  return dadosHash;
+}
+
 const criaUsuario = async (req, res) => {
   // checa se o token eh valido EEE se o usuario eh admin
   if (res.locals.isAdmin) {
-    const saltSenha = await bcrypt.genSalt(rodadasSalt);
-    const hashSenha = await bcrypt.hash(req.body.senha, saltSenha);
+    const { saltSenha, hashSenha } = await criaHashSenha(req.body.senha);
     Usuario.sync();
     let msgErro = null;
     await Usuario.create({
@@ -121,7 +132,7 @@ const removerUsuario = async (req, res) => {
 }
 
 const alteraUsuario = async (req, res) => {
-  const usuario = await Piloto.findByPk(req.params.id)
+  const usuario = await Usuario.findByPk(req.params.id)
     .then(
       res => res,
       err => null
@@ -129,14 +140,15 @@ const alteraUsuario = async (req, res) => {
   if (usuario === null)
     return await res.status(400).send();
   else {
-    if (req.body.primeiroNome) piloto.primeiroNome = req.body.primeiroNome;
-    if (req.body.sobrenome) piloto.sobrenome = req.body.sobrenome;
-    if (req.body.urlWiki) piloto.urlWiki = req.body.urlWiki;
-    if (req.body.dataNascimento) piloto.dataNascimento = req.body.dataNascimento;
-    if (req.body.nacionalidade) piloto.nacionalidade = req.body.nacionalidade;
-    if (req.body.observacao) piloto.observacao = req.body.observacao;
+    if (req.body.nome) usuario.nome = req.body.nome;
+    if (req.body.sobrenome) usuario.sobrenome = req.body.sobrenome;
+    if (req.body.senha) {
+      const { saltSenha, hashSenha } = await criaHashSenha(req.body.senha);
+      usuario.hashSenha = hashSenha;
+      usuario.salt = saltSenha;
+    }
 
-    piloto.save();
+    usuario.save();
 
     return await res.status(201)
       .json({
