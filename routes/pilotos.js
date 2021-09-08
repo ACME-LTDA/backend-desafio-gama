@@ -10,4 +10,8 @@ router.get('/:id', validaAccessToken, pilotos_controller.dadosPiloto);
 
 router.post('/cria', validaAccessToken, pilotos_controller.criaPiloto);
 
+router.post('/:id/altera', validaAccessToken, pilotos_controller.alteraPiloto);
+
+router.post('/:id/remove', validaAccessToken, pilotos_controller.removePiloto);
+
 module.exports = router;
