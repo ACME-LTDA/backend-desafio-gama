@@ -70,7 +70,7 @@ const logaUsuario = async (req, res, next) => {
       })
     } else {
       const isAdmin = usuario.administrador == "T" ? true : false
-      const accessToken = geraAcessToken(usuario.id, isAdmin)
+      const accessToken = await geraAcessToken(usuario.id, isAdmin)
       const refreshToken = await geraRefreshToken(usuario.id, isAdmin)
       dayjs.extend(duration)
       res.status(201)
@@ -165,16 +165,20 @@ const validaRefreshToken = async (req, res, next) => {
   const refreshTokenSalvo = await RefreshToken.findByPk(dadosToken.uuid)
 
   if (refreshTokenSalvo === null)
-    return res.status(400).json({
-      status: 'fail',
-      data: { message: 'Invalid refresh token' }
-    })
+    return res.status(400)
+      .clearCookie(tokenCookieName, { path: tokenCookiePath })
+      .json({
+        status: 'fail',
+        data: { message: 'Invalid refresh token' }
+      })
 
   const dataExpiracao = dayjs(refreshTokenSalvo.dataExpiracao)
   const diferenca = dataExpiracao.diff(dayjs().unix())
 
   if (diferenca <= 0)
-    return res.status(400).json({
+    return res.status(400)
+      .clearCookie(tokenCookieName, { path: tokenCookiePath })
+      .json({
       status: 'fail',
       data: { message: 'Invalid refresh token' }
     })
