@@ -12,7 +12,9 @@ router.get('/:id', validaAccessToken, usuarios_controller.retornaUsuario);
 
 router.delete('/:id/delete', validaAccessToken, usuarios_controller.removerUsuario);
 
-router.post('/:id/altera', validaAccessToken,
-  upload.array('file'), usuarios_controller.alteraUsuario);
+// router.post('/:id/altera', validaAccessToken,
+//   upload.array('file'), usuarios_controller.alteraUsuario);
+
+router.post('/:id/altera', validaAccessToken, usuarios_controller.alteraUsuario);
 
 module.exports = router;

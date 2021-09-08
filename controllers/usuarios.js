@@ -142,14 +142,9 @@ const alteraUsuario = async (req, res) => {
   else {
     if (req.body.nome) usuario.nome = req.body.nome;
     if (req.body.sobrenome) usuario.sobrenome = req.body.sobrenome;
-    if (req.body.senha) {
-      const { saltSenha, hashSenha } = await criaHashSenha(req.body.senha);
-      usuario.hashSenha = hashSenha;
-      usuario.salt = saltSenha;
-    }
-    if (req.files !== null && req.files.length > 0) {
-      console.log(req.files);
-    }
+    // if (req.files !== null && req.files.length > 0) {
+    //   console.log(req.files);
+    // }
 
     usuario.save();
 
