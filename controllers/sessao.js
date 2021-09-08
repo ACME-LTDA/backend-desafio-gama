@@ -133,7 +133,7 @@ const validaAccessToken = async (req, res, next) => {
           }
         })
       }
-    } else if (err instanceof jwt.JsonWebTokenError) {
+    } else if (err !== null) {
       return await res.status(400).json({
         status: 'fail',
         data: {
